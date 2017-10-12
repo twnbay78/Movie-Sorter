@@ -1,5 +1,5 @@
 <h1>Movie Sorter</h1>
-
+by Leo Scarano and Jarisha Olanday
 <h3>Summary</h3>
 
 It is very useful in many cases to sort large sets of data. One good example of 
@@ -107,11 +107,6 @@ if any of the data being sorted is close to a small number, or exceeds an arbitr
 it is saved in array for further analysis. If a user wanted to adjust the values of the outlier data,
 they can simply change the values of the checks in the compare functions. 
 <br>
-
-<h3>Credits</h3>
-
-<strong>Credit for writing the entirety of this project goes to Jarisha Olanday 
-and myslef</strong>
 
 </div>
 <br>
