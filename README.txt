@@ -1,1 +1,0 @@
-By. Jarisha and Leo
