@@ -40,7 +40,7 @@ enum fields
 
 typedef struct movie_data
 {
-        char * fields[28]; /*Holds the values of each column in the row*/
+        char ** fields; /*Holds the values of each column in the row*/
         int line_num; /*Holds the row number*/
         char * line; /*Holds the entire row as a string*/
 

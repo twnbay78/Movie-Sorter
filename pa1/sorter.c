@@ -56,7 +56,7 @@ void get_col_type(){
 
 /*Creates substrings from a string*/
 
-void get_sort_col_info(char * arg2, char * header){
+int  get_sort_col_info(char * arg2, char * header){
         char* temp = strdup(header);
         char* field;
         int col_num = 0;
@@ -70,6 +70,23 @@ void get_sort_col_info(char * arg2, char * header){
         }
         free((char *)temp);
         get_col_type();
+        return col_num;
+}
+
+void create_csv(int array_size, Movie * movies, char * header, char * sort_col){
+        char * filename = (char *)(malloc((strlen("sortedmovies_")+strlen(sort_col)+strlen(".csv"))*sizeof(char)));
+        filename = strcpy(filename,"sortedmovies_");
+        filename = strcat(filename,sort_col);
+        filename = strcat(filename,".csv");
+        FILE *output = fopen(filename,"w+");
+        fprintf(output, header);
+        int i;
+        for(i = 0; i < array_size-1; ++i){
+                fprintf(output, movies[i].line);
+        }
+        fclose(output);
+        printf("File Created: %s\n",filename);
+        free(filename);
 }
 
 int main(int argc, const char * argv[])
@@ -97,7 +114,7 @@ int main(int argc, const char * argv[])
 
         fgets(line, 1024, fp); /*Get header line*/
         char * header = strdup(line);
-        get_sort_col_info(argv[2],line);/*Finds the sorting column number and type according to argument*/
+        int col_num = get_sort_col_info(argv[2],line);/*Finds the sorting column number and type according to argument*/
 
         size_t size = 1;
         Movie * mov = (Movie *)malloc(size * sizeof(Movie)); /*Array to hold structs of movies*/
@@ -117,9 +134,12 @@ int main(int argc, const char * argv[])
 
                 mov[row_num-1].line = strdup(line); /*Save whole line in struct for easy print out*/
                 mov[row_num-1].line_num = row_num;
+
+                mov[row_num-1].fields = (char **)malloc(col_num * sizeof(char *));
+
                 /*Goes through each line and inserts each field into the field array of each struct*/
                 while((field=strsep(&tmp, ",")) !=NULL){ /*Iterates through each column*/
-
+                        mov[row_num-1].fields[index] = (char *)malloc(strlen(field)*sizeof(char));
                         if(index == 10){ /*Checks to see if the next column is movie_title, where commas can possibly be in the field*/
                                 mov[row_num-1].fields[index] = field;
                                 if(strstr(line,"\"")!=NULL){ /*First checks if the movie_title is quoted as in there is a comma in the field*/
@@ -155,11 +175,7 @@ int main(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-        fprintf(stdout, header);
-	int i;
-	for(i = 0; i < size-1; ++i){
-		fprintf(stdout, mov[i].line);
-	}
+        create_csv(size,mov, header, argv[2]);
         free((char *)header);
         return 0;
 }

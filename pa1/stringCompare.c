@@ -20,7 +20,7 @@ int stringCompare(void* arr1, void* arr2, int index1, int index2){
 	// return values
 	if(strcasecmp(p1Data, p2Data) < 0 || strcasecmp(p1Data, p2Data) == 0){
 		return 1;
-	}else if(strcmp(p1Data, p2Data) > 0){
+	}else if(strcasecmp(p1Data, p2Data) > 0){
 		return 0;
 	}else {
 		printf("Something went wrong :(\n");
