@@ -11,6 +11,14 @@ extern int sort_col_num;
 extern int sort_col_type;
 
 
+void Copy(void* arr1, void* arr2, int length, int index, void Assign(void*, void*, int, int)){
+
+	int i;
+	for(i = 0; i < length; i++){
+		Assign(arr1, arr2, i, index+i);
+	}
+}
+
 // merge function joins array Left and array Right into array Arr in sorted order
 void merge(void *Arr, void *leftArr, void* rightArr, int leftArrSize, int rightArrSize,
 		int Compare(void*, void*, int, int),
@@ -65,7 +73,7 @@ void mergeSort(void* Arr, int arrSize, int structSize,
 
 	// Declaring left + right arrays, and required array indicies
 	void *leftArr, *rightArr;
-	int middle, i;
+	int middle;
 
 	// BASE CASE: if array size is 1, the array is already split
 	if(arrSize < 2){
@@ -101,10 +109,3 @@ void mergeSort(void* Arr, int arrSize, int structSize,
 
 }
 
-void Copy(void* arr1, void* arr2, int length, int index, void Assign(void*, void*, int, int)){
-
-	int i;
-	for(i = 0; i < length; i++){
-		Assign(arr1, arr2, i, index+i);
-	}
-}
