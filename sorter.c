@@ -95,7 +95,7 @@ void create_csv(int array_size, Movie * movies, char * header, const char * sort
 }
 
 // Function that reads the outputed data from a .csv file from STDIN, loads it into an array of structs, sorts the array of structs, and creates a sorted .csv file
-Movie* sort(const char** col_args, int count ){
+Movie* sort(const char** col_args, int count, const char* output_dirname ){
         FILE * fp = stdin;      /*Get file from stdin*/
 	char* col_headers  = (char*)malloc(sizeof(char) * 1024);
         char* line = (char*)malloc(sizeof(char)*1024);        /*Buffer line*/
@@ -200,6 +200,18 @@ Movie* sort(const char** col_args, int count ){
 	return mov;
 }
 
+// function for concatenating 2 string2 onto string1 -> used for file paths
+char* stringConcat(char* string1, char* string2){
+	// create output string
+	char* outputString = (char*)malloc(strlen(string1) + strlen(string2));
+	// copies the first string 
+	strcpy(outputString, string1);
+	// concats string2 onto output string -> memory is already handled
+	strcat(outputString, string2);
+	return outputString;
+	
+}
+
 int main(int argc, const char * argv[])
 {
 
@@ -210,7 +222,8 @@ int main(int argc, const char * argv[])
 	count = how many different column headers are specified
 	program_args[] = array of all program arguments
 	col_check = value used to check whether a column name was specified*/
-	char* argv2 = argv[2];
+	char* argv2 = (char*)malloc(sizeof(char) * strlen(argv[2]));
+	argv2 = strdup(argv[2]);
 	char* token;
 	const char* col_args[28];
 	int count = 0;
@@ -226,15 +239,15 @@ int main(int argc, const char * argv[])
 	// loads program arguments into an array
 	
 	if(argv[0] == NULL){
-		fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory>|\n");
+		fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory> |\n");
 		exit(EXIT_FAILURE);
 	} 
 	if(argv[1] == NULL){
-		fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory>|\n");
+		fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory> |\n");
 		exit(EXIT_FAILURE);
 	}
 	if(argv[2] == NULL){
-		fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory>|\n");
+		fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory> |\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -245,7 +258,7 @@ int main(int argc, const char * argv[])
 		if(strcmp(program_args[i], "-d") == 0){
 			// if there is no parameter
 			if((i+1) >= argc){
-				fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory>|\n");
+				fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory> |\n");
 				exit(EXIT_FAILURE);
 			}
 			input_dirname = argv[i+1];
@@ -256,7 +269,7 @@ int main(int argc, const char * argv[])
 		}else if(strcmp(program_args[i], "-o") == 0){
 			// if there is no parameter
 			if((i+1) >= argc){
-				fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory>|\n");
+				fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory> |\n");
 				exit(EXIT_FAILURE);
 			}
 			output_dirname = argv[i+1];
@@ -268,7 +281,7 @@ int main(int argc, const char * argv[])
 		else if(strcmp(program_args[i], "-c") == 0){
 			// if there is no parameter
 			if((i+1) >= argc){
-				fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory>|\n");
+				fprintf(stderr, "ERROR: Expected Usage: ./sorter -c <column1,column2..> | -d <input_directory> -o <output_directory> |\n");
 				exit(EXIT_FAILURE);
 			}
 			// if muliple parameters are specified for the column name
@@ -285,7 +298,7 @@ int main(int argc, const char * argv[])
 			i += 1;
 			col_check = 1;
 			continue;
-		}
+			}
 		}
 	++i;
 	}
@@ -296,23 +309,43 @@ int main(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
+
+	printf("- - - - - - - - - - - - - - - -\n");
+
 	// dir pointer
 	DIR *dir;
 	// struct that holds folder metadata
-	struct dirent *ent;
+	struct dirent *entry;
 	dir = opendir(input_dirname);
+	// if the dir was properly opened
 	if(dir != NULL){
-		// recurse through directory
-		while((ent = readdir(dir)) != NULL){
-			printf("ent_name: %s\n", ent->d_name);
+		// traverse through directory
+		while((entry = readdir(dir)) != NULL){
+			// ignores the current and previous directory
+			if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
+				continue;
+			}
+			printf("entry_name: %s\n", entry->d_name);
+			// determines if the entry is a .csv file
+			if(strstr(entry->d_name, ".csv")){
+				printf("    -> CSV FOUND\n");
+			}
+			// determines if the entry is a dir 
+			if(entry->d_type == 4){
+				printf("    -> DIR FOUND\n");
+			}
 		}
 	}else {
 		fprintf(stderr, "ERROR: could not read the input directory\n");
 		exit(EXIT_FAILURE);
 	}
 
-	// calling function to read csv data and sort 
-	sort(col_args, count);
+	printf("- - - - - - - - - - - - - - - -\n");
 
+	// calling function to read csv data and sort 
+	sort(col_args, count, output_dirname);
+	
+	// freeing memory
+	free(argv2);
         return 0;
 }

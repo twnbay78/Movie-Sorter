@@ -1,5 +1,5 @@
 C	=       gcc
-FLAGS   =       -Wall -g 
+FLAGS   =       -Wall -g -Werror  
 COMPILE =       $(CC) $(FLAGS)
 
 all     :       sorter
